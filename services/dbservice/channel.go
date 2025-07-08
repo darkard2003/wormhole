@@ -19,7 +19,6 @@ func (s *DBService) CreateChannel(channel *models.Channel, userId int) error {
 		tx.Rollback()
 		return err
 	}
-	defer res.Close()
 	var count int
 	if res.Next() {
 		if err := res.Scan(&count); err != nil {
@@ -28,6 +27,7 @@ func (s *DBService) CreateChannel(channel *models.Channel, userId int) error {
 			return err
 		}
 	}
+	res.Close()
 	if count > 0 {
 		log.Println("Channel with this name already exists for the user")
 		tx.Rollback()
