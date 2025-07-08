@@ -1,0 +1,18 @@
+# Go binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Local environment variables
+.env
+
+# IDE settings folders
+.idea/
+.vscode/
+
+# Scratch directory for temporary files
+scratch/

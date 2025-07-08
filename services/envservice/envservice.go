@@ -2,6 +2,7 @@ package envservice
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -13,7 +14,7 @@ func LoadEnv() error {
 		return fmt.Errorf("error loading .env file: %w", err)
 	}
 	os.Setenv("ENV_LOADED", "true")
-	fmt.Println("Environment variables loaded successfully")
+	log.Println("Environment variables loaded successfully")
 	return nil
 }
 

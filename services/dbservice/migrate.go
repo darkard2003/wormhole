@@ -2,6 +2,7 @@ package dbservice
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"sort"
 	"strings"
@@ -26,10 +27,10 @@ func (db *DBService) InitializeMigrationTable() error {
 	);`
 	_, err := db.DB.Exec(query)
 	if err != nil {
-		fmt.Println("Error creating migrations table:", err)
+		log.Println("Error creating migrations table:", err)
 		return fmt.Errorf("error creating migrations table: %w", err)
 	}
-	fmt.Println("Migrations table initialized successfully")
+	log.Println("Migrations table initialized successfully")
 	return nil
 }
 
@@ -40,7 +41,7 @@ func (db *DBService) GetAppliedMigrations() ([]MigrationTable, error) {
 	query := `SELECT id, migration, description, applied_at FROM migrations;`
 	rows, err := db.DB.Query(query)
 	if err != nil {
-		fmt.Println("Error fetching applied migrations:", err)
+		log.Println("Error fetching applied migrations:", err)
 		return nil, fmt.Errorf("error fetching applied migrations: %w", err)
 	}
 	defer rows.Close()
@@ -49,7 +50,7 @@ func (db *DBService) GetAppliedMigrations() ([]MigrationTable, error) {
 	for rows.Next() {
 		var migration MigrationTable
 		if err := rows.Scan(&migration.ID, &migration.Migration, &migration.Description, &migration.AppliedAt); err != nil {
-			fmt.Println("Error scanning row:", err)
+			log.Println("Error scanning row:", err)
 			return nil, fmt.Errorf("error scanning row: %w", err)
 		}
 		migrations = append(migrations, migration)
@@ -65,7 +66,7 @@ func (db *DBService) MigrationExists(migrationFile string) (bool, error) {
 	var count int
 	err := db.DB.QueryRow(query, migrationFile).Scan(&count)
 	if err != nil {
-		fmt.Println("Error checking migration existence:", err)
+		log.Println("Error checking migration existence:", err)
 		return false, fmt.Errorf("error checking migration existence: %w", err)
 	}
 	return count > 0, nil
@@ -75,7 +76,7 @@ func GetMigrationFiles() ([]string, error) {
 	os.MkdirAll("migrations", os.ModePerm)
 	files, err := os.ReadDir("migrations")
 	if err != nil {
-		fmt.Println("Error reading migration files:", err)
+		log.Println("Error reading migration files:", err)
 		return nil, fmt.Errorf("error reading migration files: %w", err)
 	}
 	var migrationFiles []string
@@ -85,12 +86,12 @@ func GetMigrationFiles() ([]string, error) {
 		}
 	}
 	if len(migrationFiles) == 0 {
-		fmt.Println("No migration files found")
+		log.Println("No migration files found")
 		return nil, fmt.Errorf("no migration files found")
 	}
-	fmt.Println("Migration files found:", migrationFiles)
+	log.Println("Migration files found:", migrationFiles)
 	sort.Strings(migrationFiles)
-	fmt.Println("Sorted migration files:", migrationFiles)
+	log.Println("Sorted migration files:", migrationFiles)
 	return migrationFiles, nil
 }
 
@@ -143,6 +144,6 @@ func (db *DBService) Migrate() error {
 			return fmt.Errorf("error committing transaction for migration %s: %w", migrationFile, err)
 		}
 	}
-	fmt.Println("All migrations applied successfully")
+	log.Println("All migrations applied successfully")
 	return nil
 }

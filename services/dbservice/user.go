@@ -2,7 +2,7 @@ package dbservice
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 
 	"github.com/darkard2003/wormhole/models"
 )
@@ -10,12 +10,12 @@ import (
 func (s *DBService) CreateUser(user *models.User) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
-		fmt.Println("Error starting transaction:", err)
+		log.Println("Error starting transaction:", err)
 	}
 	_, err = tx.Exec("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", user.Username, user.Email, user.Password)
 	if err != nil {
 		tx.Rollback()
-		fmt.Println("Error inserting user:", err)
+		log.Println("Error inserting user:", err)
 		return err
 	}
 	tx.Commit()
@@ -29,7 +29,7 @@ func (s *DBService) GetUserByUsername(username string) (*models.User, error) {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
-		fmt.Println("Error querying user:", err)
+		log.Println("Error querying user:", err)
 		return nil, err
 	}
 	return user, nil
@@ -42,7 +42,7 @@ func (s *DBService) GetUserById(id int) (*models.User, error) {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
-		fmt.Println("Error querying user:", err)
+		log.Println("Error querying user:", err)
 		return nil, err
 	}
 	return user, nil
@@ -51,13 +51,13 @@ func (s *DBService) GetUserById(id int) (*models.User, error) {
 func (s *DBService) UpdateUser(user *models.User) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
-		fmt.Println("Error starting transaction:", err)
+		log.Println("Error starting transaction:", err)
 		return err
 	}
 	_, err = tx.Exec("UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?", user.Username, user.Email, user.Password, user.Id)
 	if err != nil {
 		tx.Rollback()
-		fmt.Println("Error updating user:", err)
+		log.Println("Error updating user:", err)
 		return err
 	}
 	tx.Commit()
@@ -67,14 +67,14 @@ func (s *DBService) UpdateUser(user *models.User) error {
 func (s *DBService) DeleteUser(id int) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
-		fmt.Println("Error starting transaction", err)
+		log.Println("Error starting transaction", err)
 		return err
 	}
 
 	_, err = tx.Exec("DELETE FROM users WHERE id = ?", id)
 	if err != nil {
 		tx.Rollback()
-		fmt.Println("Error deleting user:", err)
+		log.Println("Error deleting user:", err)
 		return err
 	}
 	tx.Commit()
@@ -84,7 +84,7 @@ func (s *DBService) DeleteUser(id int) error {
 func (s *DBService) GetAllUsers() ([]*models.User, error) {
 	rows, err := s.DB.Query("SELECT id, username, email, password FROM users")
 	if err != nil {
-		fmt.Println("Error querying users:", err)
+		log.Println("Error querying users:", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -93,13 +93,13 @@ func (s *DBService) GetAllUsers() ([]*models.User, error) {
 		user := &models.User{}
 		err := rows.Scan(&user.Id, &user.Username, &user.Email, &user.Password)
 		if err != nil {
-			fmt.Println("Error scanning user:", err)
+			log.Println("Error scanning user:", err)
 			return nil, err
 		}
 		users = append(users, user)
 	}
 	if err = rows.Err(); err != nil {
-		fmt.Println("Error iterating over users:", err)
+		log.Println("Error iterating over users:", err)
 		return nil, err
 	}
 	return users, nil

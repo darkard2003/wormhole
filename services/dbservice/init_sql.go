@@ -3,6 +3,7 @@ package dbservice
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/go-sql-driver/mysql"
@@ -23,22 +24,22 @@ func (db *DBService) InitializeMySql() error {
 	var err error
 	db.DB, err = sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
-		fmt.Println("Error connecting to the database:", err)
+		log.Println("Error connecting to the database:", err)
 		return fmt.Errorf("error connecting to the database: %w", err)
 	}
 
 	pingErr := db.DB.Ping()
 	if pingErr != nil {
-		fmt.Println("Error pinging the database:", pingErr)
+		log.Println("Error pinging the database:", pingErr)
 		return fmt.Errorf("error pinging the database: %w", pingErr)
 	}
-	fmt.Println("Database connection established successfully")
+	log.Println("Database connection established successfully")
 	err = db.Migrate()
 	if err != nil {
-		fmt.Println("Error during migration:", err)
+		log.Println("Error during migration:", err)
 		return fmt.Errorf("error during migration: %w", err)
 	}
-	fmt.Println("Database migration completed successfully")
+	log.Println("Database migration completed successfully")
 	db.Initialized = true
 	return nil
 }
