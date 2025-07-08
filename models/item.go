@@ -3,6 +3,7 @@ package models
 type Item struct {
 	ID                 int    `json:"id"`
 	UserID             int    `json:"user_id"`
+	ChannelID          int    `json:"channel_id"`
 	Type               string `json:"type"`
 	Title              string `json:"title"`
 	UploadedAt         string `json:"uploaded_at"`

@@ -43,6 +43,7 @@ func main() {
 
 	authenticatedRoute.GET("/channels", channelhandelers.GetChannels)
 	authenticatedRoute.POST("/channels", channelhandelers.CreateChannel)
+	authenticatedRoute.DELETE("/channels", channelhandelers.DeleteChannel)
 
 	r.Run()
 }

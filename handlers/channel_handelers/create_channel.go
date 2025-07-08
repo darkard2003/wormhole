@@ -51,6 +51,10 @@ func CreateChannel(ctx *gin.Context) {
 	err := dbservice.GetDBService().CreateChannel(channel, userId.(int))
 
 	if err != nil {
+		if err.Error() == "channel exists" {
+			ctx.JSON(409, gin.H{"error": "Channel with this name already exists for the user"})
+			return
+		}
 		ctx.JSON(500, gin.H{"error": "Failed to create channel"})
 		return
 	}

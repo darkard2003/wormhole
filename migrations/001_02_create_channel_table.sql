@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS channels (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT uq_user_channel UNIQUE (user_id, name), 
     
     INDEX idx_user_id (user_id),
     INDEX idx_name (name),

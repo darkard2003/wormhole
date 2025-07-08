@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS items (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INTEGER NOT NULL,
+    channel_id INT NOT NULL,
     type VARCHAR(50) NOT NULL,
     title VARCHAR(255) NOT NULL,
     uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -9,6 +10,8 @@ CREATE TABLE IF NOT EXISTS items (
     encryption_metadata TEXT,
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (channel_id) REFERENCES channels(id) ON DELETE CASCADE,
+    CONSTRAINT uq_userid_channel_id_title UNIQUE (user_Id, channel_id, title),
     
     INDEX idx_user_id (user_id),
     INDEX idx_type (type),
