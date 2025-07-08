@@ -126,16 +126,25 @@ func (db *DBService) Migrate() error {
 			tx.Rollback()
 			return fmt.Errorf("error reading migration file %s: %w", migrationFile, err)
 		}
-		query := string(content)
-		if query == "" {
+		rawQueries := string(content)
+		if rawQueries == "" {
 			tx.Rollback()
 			return fmt.Errorf("migration file %s is empty", migrationFile)
 		}
-		_, err = tx.Exec(query)
-		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("error applying migration %s: %w", migrationFile, err)
+
+		queries := strings.SplitSeq(rawQueries, ";")
+		for query := range queries {
+			query = strings.TrimSpace(query)
+			if query == "" {
+				continue
+			}
+			_, err = tx.Exec(query)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("error applying migration %s: %w", migrationFile, err)
+			}
 		}
+
 		if _, err := tx.Exec("INSERT INTO migrations (migration, description, applied_at) VALUES (?, ?, NOW())", migrationFile, "Migration applied successfully"); err != nil {
 			tx.Rollback()
 			return fmt.Errorf("error recording migration %s: %w", migrationFile, err)

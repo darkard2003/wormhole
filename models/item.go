@@ -1,9 +1,12 @@
 package models
 
 type Item struct {
-	ID      string `json:"id"`
-	Type    string `json:"type"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-	FileURL string `json:"file_url"`
+	ID                 int    `json:"id"`
+	UserID             int    `json:"user_id"`
+	Type               string `json:"type"`
+	Title              string `json:"title"`
+	UploadedAt         string `json:"uploaded_at"`
+	Salt               string `json:"salt"`
+	IV                 string `json:"iv"`
+	EncryptionMetadata string `json:"encryption_metadata"`
 }
