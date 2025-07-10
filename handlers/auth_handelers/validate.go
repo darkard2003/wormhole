@@ -1,4 +1,4 @@
-package handlers
+package authhandelers
 
 import (
 	"github.com/gin-gonic/gin"

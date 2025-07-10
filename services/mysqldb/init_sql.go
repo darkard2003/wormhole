@@ -1,4 +1,4 @@
-package dbservice
+package mysqldb
 
 import (
 	"database/sql"
@@ -9,7 +9,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-func (db *DBService) InitializeMySql() error {
+func (db *MySqlRepo) Initialize() error {
 	if db.Initialized {
 		return nil
 	}

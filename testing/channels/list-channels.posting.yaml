@@ -1,0 +1,4 @@
+name: list channels
+url: $BASE_URL/user/channels
+scripts:
+  on_request: auth/setup_token.py

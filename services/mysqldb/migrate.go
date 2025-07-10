@@ -1,4 +1,4 @@
-package dbservice
+package mysqldb
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ type MigrationTable struct {
 	AppliedAt   string `json:"applied_at"`
 }
 
-func (db *DBService) InitializeMigrationTable() error {
+func (db *MySqlRepo) InitializeMigrationTable() error {
 	if db.DB == nil {
 		return fmt.Errorf("database connection is not initialized")
 	}
@@ -34,7 +34,7 @@ func (db *DBService) InitializeMigrationTable() error {
 	return nil
 }
 
-func (db *DBService) GetAppliedMigrations() ([]MigrationTable, error) {
+func (db *MySqlRepo) GetAppliedMigrations() ([]MigrationTable, error) {
 	if db.DB == nil {
 		return nil, fmt.Errorf("database connection is not initialized")
 	}
@@ -58,7 +58,7 @@ func (db *DBService) GetAppliedMigrations() ([]MigrationTable, error) {
 	return migrations, nil
 }
 
-func (db *DBService) MigrationExists(migrationFile string) (bool, error) {
+func (db *MySqlRepo) MigrationExists(migrationFile string) (bool, error) {
 	if db.DB == nil {
 		return false, fmt.Errorf("database connection is not initialized")
 	}
@@ -95,7 +95,7 @@ func GetMigrationFiles() ([]string, error) {
 	return migrationFiles, nil
 }
 
-func (db *DBService) Migrate() error {
+func (db *MySqlRepo) Migrate() error {
 	if db.DB == nil {
 		return fmt.Errorf("database connection is not initialized")
 	}

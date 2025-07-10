@@ -1,0 +1,4 @@
+name: status
+url: $BASE_URL/user/status
+scripts:
+  on_request: auth/setup_token.py

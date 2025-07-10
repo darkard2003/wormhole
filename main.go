@@ -7,17 +7,20 @@ import (
 	"github.com/darkard2003/wormhole/handlers"
 	"github.com/darkard2003/wormhole/handlers/auth_handelers"
 	channelhandelers "github.com/darkard2003/wormhole/handlers/channel_handelers"
+	"github.com/darkard2003/wormhole/interfaces"
 	"github.com/darkard2003/wormhole/middleware"
-	"github.com/darkard2003/wormhole/services/dbservice"
 	"github.com/darkard2003/wormhole/services/envservice"
+	"github.com/darkard2003/wormhole/services/mysqldb"
 	"github.com/gin-gonic/gin"
 )
+
+var db interfaces.DBInterface
 
 func init() {
 	envservice.LoadEnv()
 	log.Println("Environment variables loaded successfully")
-	db := dbservice.GetDBService()
-	err := db.InitializeMySql()
+	db = &mysqldb.MySqlRepo{}
+	err := db.Initialize()
 	if err != nil {
 		log.Println("Error initializing database:", err)
 		os.Exit(1)
@@ -31,19 +34,13 @@ func main() {
 	r.GET("/", handlers.IndexHandler)
 
 	apiv1 := r.Group("/api/v1")
-	apiv1.GET("/ping", handlers.PingHandler)
-	apiv1.GET("/health", handlers.HealthCheckHandler)
+	handlers.RegisterAPIRoutes(apiv1)
 
-	apiv1.POST("/signup", authhandelers.SignUpHandler)
-	apiv1.POST("/signin", authhandelers.SignInHandler)
-
+	authhandelers.RegisterAuthRoutes(apiv1, db)
 	authenticatedRoute := apiv1.Group("/user")
 	authenticatedRoute.Use(middleware.AuthMiddleware())
-	authenticatedRoute.GET("/status", handlers.AuthStatus)
-
-	authenticatedRoute.GET("/channels", channelhandelers.GetChannels)
-	authenticatedRoute.POST("/channels", channelhandelers.CreateChannel)
-	authenticatedRoute.DELETE("/channels", channelhandelers.DeleteChannel)
+	authenticatedRoute.GET("/status", authhandelers.AuthStatus)
+	channelhandelers.RegisterChannelRoutes(authenticatedRoute, db)
 
 	r.Run()
 }

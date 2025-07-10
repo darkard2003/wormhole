@@ -1,4 +1,4 @@
-package dbservice
+package mysqldb
 
 import (
 	"database/sql"
@@ -7,7 +7,7 @@ import (
 	"github.com/darkard2003/wormhole/models"
 )
 
-func (s *DBService) CreateUser(user *models.User) error {
+func (s *MySqlRepo) CreateUser(user *models.User) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
 		log.Println("Error starting transaction:", err)
@@ -22,7 +22,7 @@ func (s *DBService) CreateUser(user *models.User) error {
 	return nil
 }
 
-func (s *DBService) GetUserByUsername(username string) (*models.User, error) {
+func (s *MySqlRepo) GetUserByUsername(username string) (*models.User, error) {
 	user := &models.User{}
 	err := s.DB.QueryRow("SELECT id, username, email, password FROM users WHERE username = ?", username).Scan(&user.Id, &user.Username, &user.Email, &user.Password)
 	if err != nil {
@@ -35,7 +35,7 @@ func (s *DBService) GetUserByUsername(username string) (*models.User, error) {
 	return user, nil
 }
 
-func (s *DBService) GetUserById(id int) (*models.User, error) {
+func (s *MySqlRepo) GetUserById(id int) (*models.User, error) {
 	user := &models.User{}
 	err := s.DB.QueryRow("SELECT id, username, email, password FROM users WHERE id = ?", id).Scan(&user.Id, &user.Username, &user.Email, &user.Password)
 	if err != nil {
@@ -48,7 +48,7 @@ func (s *DBService) GetUserById(id int) (*models.User, error) {
 	return user, nil
 }
 
-func (s *DBService) UpdateUser(user *models.User) error {
+func (s *MySqlRepo) UpdateUser(user *models.User) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
 		log.Println("Error starting transaction:", err)
@@ -64,7 +64,7 @@ func (s *DBService) UpdateUser(user *models.User) error {
 	return nil
 }
 
-func (s *DBService) DeleteUser(id int) error {
+func (s *MySqlRepo) DeleteUser(id int) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
 		log.Println("Error starting transaction", err)
@@ -81,7 +81,7 @@ func (s *DBService) DeleteUser(id int) error {
 	return nil
 }
 
-func (s *DBService) GetAllUsers() ([]*models.User, error) {
+func (s *MySqlRepo) GetAllUsers() ([]*models.User, error) {
 	rows, err := s.DB.Query("SELECT id, username, email, password FROM users")
 	if err != nil {
 		log.Println("Error querying users:", err)

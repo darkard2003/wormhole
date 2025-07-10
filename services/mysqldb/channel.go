@@ -1,4 +1,4 @@
-package dbservice
+package mysqldb
 
 import (
 	"database/sql"
@@ -8,7 +8,7 @@ import (
 	"github.com/darkard2003/wormhole/models"
 )
 
-func (s *DBService) CreateChannel(channel *models.Channel, userId int) error {
+func (s *MySqlRepo) CreateChannel(channel *models.Channel, userId int) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
 		return err
@@ -48,7 +48,7 @@ func (s *DBService) CreateChannel(channel *models.Channel, userId int) error {
 	return nil
 }
 
-func (s *DBService) GetChannelById(id int) (*models.Channel, error) {
+func (s *MySqlRepo) GetChannelById(id int) (*models.Channel, error) {
 	channel := &models.Channel{}
 	err := s.DB.QueryRow("SELECT id, user_id, name, description, protected, password FROM channels WHERE id = ?", id).Scan(&channel.ID, &channel.UserID, &channel.Name, &channel.Description, &channel.Protected, &channel.Password)
 	if err != nil {
@@ -61,7 +61,7 @@ func (s *DBService) GetChannelById(id int) (*models.Channel, error) {
 	return channel, nil
 }
 
-func (s *DBService) GetChannelsByUserId(userId int) ([]*models.Channel, error) {
+func (s *MySqlRepo) GetChannelsByUserId(userId int) ([]*models.Channel, error) {
 	channels := []*models.Channel{}
 	rows, err := s.DB.Query("SELECT id, user_id, name, description, protected, password FROM channels WHERE user_id = ?", userId)
 	if err != nil {
@@ -80,7 +80,7 @@ func (s *DBService) GetChannelsByUserId(userId int) ([]*models.Channel, error) {
 	return channels, nil
 }
 
-func (s *DBService) UpdateChannel(channel *models.Channel) error {
+func (s *MySqlRepo) UpdateChannel(channel *models.Channel) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
 		log.Println("Error starting transaction for channel update:", err)
@@ -103,7 +103,7 @@ func (s *DBService) UpdateChannel(channel *models.Channel) error {
 	return nil
 }
 
-func (s *DBService) DeleteChannel(id, userId int) error {
+func (s *MySqlRepo) DeleteChannel(id, userId int) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
 		log.Println("Error starting transaction for channel deletion:", err)

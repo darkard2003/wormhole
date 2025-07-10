@@ -1,8 +1,8 @@
-package dbservice
+package mysqldb
 
 import "database/sql"
 
-type DBService struct {
+type MySqlRepo struct {
 	DB          *sql.DB
 	Initialized bool
-} 
+}
