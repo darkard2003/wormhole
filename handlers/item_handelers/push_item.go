@@ -12,7 +12,7 @@ import (
 )
 
 type PushItemRequest struct {
-	ChannelName     string `json:"channel_name" binding:""`
+	ChannelName     string `json:"channel_name"`
 	ChannelPassword string `json:"channel_password"`
 	Type            string `json:"type" binding:"required"`
 	Title           string `json:"title"`
@@ -104,8 +104,8 @@ func PushItem(db db.DBInterface) gin.HandlerFunc {
 		if err != nil {
 			httpError := utils.DBToHttpError(err)
 			ctx.JSON(httpError.Code, gin.H{"error": httpError.Response})
+			return
 		}
-
 		ctx.JSON(http.StatusCreated, gin.H{"message": "Item created successfully"})
 	}
 }
