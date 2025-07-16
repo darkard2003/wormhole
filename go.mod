@@ -7,6 +7,8 @@ require (
 	github.com/joho/godotenv v1.5.1
 )
 
+require github.com/bombsimon/mysql-error-numbers v1.1.0 // indirect
+
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/bytedance/sonic v1.13.3 // indirect

@@ -3,15 +3,21 @@ package channelhandelers
 import (
 	"log"
 
-	"github.com/darkard2003/wormhole/interfaces"
-	"github.com/darkard2003/wormhole/models"
+	"github.com/darkard2003/wormhole/services/db"
+	"github.com/darkard2003/wormhole/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func CreateChannelHandler(db interfaces.DBInterface) gin.HandlerFunc {
+func CreateChannelHandler(db db.DBInterface) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		userId, exists := ctx.Get("userId")
+		userIdInt, ok := userId.(int)
+		if !ok {
+			log.Println("Error casting userId to int")
+			ctx.JSON(500, gin.H{"error": "Internal server error"})
+			return
+		}
 
 		if !exists || userId == nil {
 			ctx.JSON(400, gin.H{"error": "Unauthorized"})
@@ -41,22 +47,11 @@ func CreateChannelHandler(db interfaces.DBInterface) gin.HandlerFunc {
 			passwordHash = string(passwordHashBytes)
 		}
 
-		channel := &models.Channel{
-			UserID:      userId.(int),
-			Name:        request.Name,
-			Description: request.Description,
-			Protected:   request.Protected,
-			Password:    passwordHash,
-		}
-
-		err := db.CreateChannel(channel, userId.(int))
+		_, err := db.CreateChannel(userIdInt, request.Name, request.Description, request.Protected, passwordHash)
 
 		if err != nil {
-			if err.Error() == "channel exists" {
-				ctx.JSON(409, gin.H{"error": "Channel with this name already exists for the user"})
-				return
-			}
-			ctx.JSON(500, gin.H{"error": "Failed to create channel"})
+			httpError := utils.DBToHttpError(err)
+			ctx.JSON(httpError.Code, gin.H{"error": httpError.Response})
 			return
 		}
 		ctx.JSON(201, gin.H{

@@ -8,3 +8,4 @@ type Channel struct {
 	Protected   bool   `json:"protected"`
 	Password    string `json:"password"`
 }
+

@@ -2,9 +2,11 @@ package authhandelers
 
 import (
 	"log"
+	"net/http"
 
-	"github.com/darkard2003/wormhole/interfaces"
+	"github.com/darkard2003/wormhole/services/db"
 	"github.com/darkard2003/wormhole/services/jwtservice"
+	"github.com/darkard2003/wormhole/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -14,12 +16,12 @@ type SignInInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
-func SignInHandlerHandler(db interfaces.DBInterface) gin.HandlerFunc {
+func SignInHandlerHandler(db db.DBInterface) gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		var input SignInInput
 		if err := ctx.ShouldBindJSON(&input); err != nil {
-			ctx.JSON(400, gin.H{"error": "Invalid input"})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 			return
 		}
 
@@ -27,13 +29,13 @@ func SignInHandlerHandler(db interfaces.DBInterface) gin.HandlerFunc {
 
 		user, err := db.GetUserByUsername(input.Username)
 		if err != nil {
-			log.Println("Error fetching user:", err)
-			ctx.JSON(500, gin.H{"error": "Database error"})
+			httpError := utils.DBToHttpError(err)
+			ctx.JSON(httpError.Code, gin.H{"error": httpError.Response})
 			return
 		}
 
 		if user == nil {
-			ctx.JSON(404, gin.H{"error": "Invalid username or password"})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid username or password"})
 			return
 		}
 
@@ -41,7 +43,7 @@ func SignInHandlerHandler(db interfaces.DBInterface) gin.HandlerFunc {
 
 		if err != nil {
 			log.Println("Password mismatch:", err)
-			ctx.JSON(401, gin.H{"error": "Invalid username or password"})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid username or password"})
 			return
 		}
 

@@ -1,0 +1,4 @@
+name: get channels
+url: $BASE_URL/user/channels
+scripts:
+  on_request: scripts/add_token_to_request.py

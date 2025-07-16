@@ -1,8 +1,11 @@
 package channelhandelers
 
 import (
-	"github.com/darkard2003/wormhole/interfaces"
+	"net/http"
+
 	"github.com/darkard2003/wormhole/models"
+	"github.com/darkard2003/wormhole/services/db"
+	"github.com/darkard2003/wormhole/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,24 +16,25 @@ type SanitedChannel struct {
 	Protected   bool   `json:"protected"`
 }
 
-func GetChannelHandeler(db interfaces.DBInterface) gin.HandlerFunc {
+func GetChannelHandeler(db db.DBInterface) gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		userId, exists := ctx.Get("userId")
 		if !exists || userId == nil {
-			ctx.JSON(400, gin.H{"error": "Unauthorized"})
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			return
 		}
 		channels, err := db.GetChannelsByUserId(userId.(int))
+		if err != nil {
+			httpError := utils.DBToHttpError(err)
+			ctx.JSON(httpError.Code, gin.H{"error": httpError.Response})
+			return
+		}
 		sanitizedChannels := make([]*SanitedChannel, len(channels))
 		for i, channel := range channels {
 			sanitizedChannels[i] = SanitizeChannel(channel)
 		}
-		if err != nil {
-			ctx.JSON(500, gin.H{"error": "Failed to retrieve channels"})
-			return
-		}
-		ctx.JSON(200, gin.H{
+		ctx.JSON(http.StatusOK, gin.H{
 			"total":    len(channels),
 			"channels": sanitizedChannels,
 		})

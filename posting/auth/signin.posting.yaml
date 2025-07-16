@@ -1,0 +1,15 @@
+name: signin
+method: POST
+url: $BASE_URL/signin
+body:
+  content: |-
+    {
+      "username": "$BASE_USERNAME",
+      "password": "$BASE_PASSWORD"
+    }
+  content_type: application/json
+headers:
+- name: content-type
+  value: application/json
+scripts:
+  on_response: scripts/store_auth_token.py
