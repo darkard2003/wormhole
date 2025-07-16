@@ -4,11 +4,12 @@ url: $BASE_URL/user/items
 body:
   content: |-
     {
+      "title": "byee",
       "type": "text",
-      "salt": "1234",
-      "iv": "hello",
+      "salt": "1233453",
+      "iv": "helloworldnoice",
       "encryption": "noencrypt",
-      "text_content": "Hello World"
+      "text_content": "Hello World Noice"
     }
   content_type: application/json
 headers:
