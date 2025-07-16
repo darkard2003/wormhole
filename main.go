@@ -9,8 +9,8 @@ import (
 	channelhandelers "github.com/darkard2003/wormhole/handlers/channel_handelers"
 	"github.com/darkard2003/wormhole/middleware"
 	"github.com/darkard2003/wormhole/services/db"
+	"github.com/darkard2003/wormhole/services/db/mysqldb"
 	"github.com/darkard2003/wormhole/services/envservice"
-	"github.com/darkard2003/wormhole/services/mysqldb"
 	"github.com/gin-gonic/gin"
 )
 

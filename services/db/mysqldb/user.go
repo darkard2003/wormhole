@@ -11,6 +11,7 @@ func (s *MySqlRepo) CreateUser(username, password string, email *string) (int, e
 	tx, err := s.DB.Begin()
 	if err != nil {
 		log.Println("Error starting transaction:", err)
+		return -1, ToDBError(err, "users", "username")
 	}
 
 	defer RecoverDB(tx, &err)
@@ -27,6 +28,7 @@ func (s *MySqlRepo) CreateUser(username, password string, email *string) (int, e
 
 func (s *MySqlRepo) GetUserByUsername(username string) (*models.User, error) {
 	user := &models.User{}
+
 	err := s.DB.QueryRow("SELECT id, username, email, password FROM users WHERE username = ?", username).Scan(&user.Id, &user.Username, &user.Email, &user.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
