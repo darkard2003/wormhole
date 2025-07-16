@@ -1,0 +1,18 @@
+name: push item
+method: POST
+url: $BASE_URL/user/items
+body:
+  content: |-
+    {
+      "type": "text",
+      "salt": "1234",
+      "iv": "hello",
+      "encryption": "noencrypt",
+      "text_content": "Hello World"
+    }
+  content_type: application/json
+headers:
+- name: content-type
+  value: application/json
+scripts:
+  on_request: scripts/add_token_to_request.py

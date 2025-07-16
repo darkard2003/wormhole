@@ -1,0 +1,8 @@
+name: pop item
+description: ""
+url: $BASE_URL/user/items
+headers:
+- name: content-type
+  value: application/json
+scripts:
+  on_request: scripts/add_token_to_request.py
