@@ -56,6 +56,19 @@ func (s *MySqlRepo) GetChannelById(id int) (*models.Channel, error) {
 	return channel, nil
 }
 
+func (s *MySqlRepo) GetChannelByName(userId int, channelName string) (*models.Channel, error) {
+	channel := &models.Channel{}
+	err := s.DB.QueryRow("SELECT id, user_id, name, description, protected, password FROM channels WHERE name = ?", channelName).Scan(&channel.ID, &channel.UserID, &channel.Name, &channel.Description, &channel.Protected, &channel.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		log.Println("Error querying channel:", err)
+		return nil, ToDBError(err, "channels", "id")
+	}
+	return channel, nil
+}
+
 func (s *MySqlRepo) GetChannelsByUserId(userId int) ([]*models.Channel, error) {
 	channels := []*models.Channel{}
 	rows, err := s.DB.Query("SELECT id, user_id, name, description, protected, password FROM channels WHERE user_id = ?", userId)

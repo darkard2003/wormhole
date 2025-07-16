@@ -5,8 +5,9 @@ import (
 	"os"
 
 	"github.com/darkard2003/wormhole/handlers"
-	"github.com/darkard2003/wormhole/handlers/auth_handelers"
+	authhandelers "github.com/darkard2003/wormhole/handlers/auth_handelers"
 	channelhandelers "github.com/darkard2003/wormhole/handlers/channel_handelers"
+	itemhandelers "github.com/darkard2003/wormhole/handlers/item_handelers"
 	"github.com/darkard2003/wormhole/middleware"
 	"github.com/darkard2003/wormhole/services/db"
 	"github.com/darkard2003/wormhole/services/db/mysqldb"
@@ -39,8 +40,10 @@ func main() {
 	authhandelers.RegisterAuthRoutes(apiv1, appDb)
 	authenticatedRoute := apiv1.Group("/user")
 	authenticatedRoute.Use(middleware.AuthMiddleware())
+
 	authenticatedRoute.GET("/status", authhandelers.AuthStatus)
 	channelhandelers.RegisterChannelRoutes(authenticatedRoute, appDb)
+	itemhandelers.RegisterItemRoutes(authenticatedRoute, appDb)
 
 	r.Run()
 }

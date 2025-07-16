@@ -1,5 +1,10 @@
 package models
 
+const (
+	ItemTypeText = "text"
+	ItemTypeFile = "file"
+)
+
 type Item struct {
 	ID                 int    `json:"id"`
 	UserID             int    `json:"user_id"`
