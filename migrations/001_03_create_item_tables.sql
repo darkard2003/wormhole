@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS text_items (
 CREATE TABLE IF NOT EXISTS file_items (
     item_id INT PRIMARY KEY,
     file_name VARCHAR(255) NOT NULL,
+    blob_size BIGINT NOT NULL,
     file_size BIGINT NOT NULL,
     mime_type VARCHAR(100) NOT NULL,
     file_created_at DATETIME,
