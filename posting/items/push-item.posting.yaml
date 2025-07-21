@@ -2,18 +2,22 @@ name: push item
 method: POST
 url: $BASE_URL/user/items
 body:
-  content: |-
-    {
-      "title": "byee",
-      "type": "text",
-      "salt": "1233453",
-      "iv": "helloworldnoice",
-      "encryption": "noencrypt",
-      "text_content": "Hello World Noice"
-    }
-  content_type: application/json
+  form_data:
+  - name: type
+    value: text
+  - name: title
+    value: howdy
+  - name: salt
+    value: 1234h
+  - name: iv
+    value: hello
+  - name: encryption
+    value: noencrypt
+  - name: text_content
+    value: hello world
+  content_type: application/x-www-form-urlencoded
 headers:
 - name: content-type
-  value: application/json
+  value: application/x-www-form-urlencoded
 scripts:
   on_request: scripts/add_token_to_request.py

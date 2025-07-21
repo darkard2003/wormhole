@@ -1,33 +1,35 @@
 package itemhandelers
 
 import (
+	"io"
 	"log"
 	"net/http"
 
 	"github.com/darkard2003/wormhole/models"
 	"github.com/darkard2003/wormhole/services/db"
+	storageservice "github.com/darkard2003/wormhole/services/storage_service"
 	"github.com/darkard2003/wormhole/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type PushItemRequest struct {
-	ChannelName     string `json:"channel_name"`
-	ChannelPassword string `json:"channel_password"`
-	Type            string `json:"type" binding:"required"`
-	Title           string `json:"title"`
-	Salt            string `json:"salt" binding:"required"`
-	IV              string `json:"iv" binding:"required"`
-	Encryption      string `json:"encryption" binding:"required"`
-	TextContent     string `json:"text_content"`
-	Filename        string `json:"filename"`
-	Filesize        int64  `json:"filesize"`
-	MimeType        string `json:"mimetype"`
-	FileCreatedAt   string `json:"file_created_at"`
-	FileUpdatedAt   string `json:"file_updated_at"`
+	ChannelName     string `form:"channel_name"`
+	ChannelPassword string `form:"channel_password"`
+	Type            string `form:"type" binding:"required"`
+	Title           string `form:"title" binding:"required"`
+	Salt            string `form:"salt" binding:"required"`
+	IV              string `form:"iv" binding:"required"`
+	Encryption      string `form:"encryption" binding:"required"`
+	TextContent     string `form:"text_content"`
+	Filename        string `form:"filename"`
+	MimeType        string `form:"mimetype"`
+	FileSize        int64  `form:"filesize"`
+	FileCreatedAt   string `form:"file_created_at"`
+	FileUpdatedAt   string `form:"file_updated_at"`
 }
 
-func PushItem(db db.DBInterface) gin.HandlerFunc {
+func PushItem(db db.DBInterface, s storageservice.StorageInterface) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		userId, exists := ctx.Get("userId")
 		if !exists || userId == nil {
@@ -43,7 +45,10 @@ func PushItem(db db.DBInterface) gin.HandlerFunc {
 		}
 
 		var request PushItemRequest
-		ctx.ShouldBindJSON(&request)
+		if err := ctx.ShouldBind(&request); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 
 		if request.ChannelName == "" {
 			request.ChannelName = "default"
@@ -64,13 +69,8 @@ func PushItem(db db.DBInterface) gin.HandlerFunc {
 				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Channel password required"})
 				return
 			}
-			passHashBytes, err := bcrypt.GenerateFromPassword([]byte(request.ChannelPassword), bcrypt.DefaultCost)
+			err := bcrypt.CompareHashAndPassword([]byte(channel.Password), []byte(request.ChannelPassword))
 			if err != nil {
-				log.Println("Error hashing password:", err)
-				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
-				return
-			}
-			if string(passHashBytes) != channel.Password {
 				ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Channel password incorrect"})
 				return
 			}
@@ -93,8 +93,50 @@ func PushItem(db db.DBInterface) gin.HandlerFunc {
 				Content: request.TextContent,
 			}
 		case "file":
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Not implemented"})
-			return
+			fileheader, err := ctx.FormFile("file")
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file"})
+				return
+			}
+
+			file, err := fileheader.Open()
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file"})
+				return
+			}
+			defer file.Close()
+
+			data, err := io.ReadAll(file)
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file"})
+				return
+			}
+
+			id, err := s.StoreBlob(data)
+			if err != nil {
+				log.Println("Error storing blob:", err)
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+				return
+			}
+
+			item = &models.FileItem{
+				Item: models.Item{
+					UserID:             userIdInt,
+					ChannelID:          channel.ID,
+					Type:               request.Type,
+					Title:              request.Title,
+					Salt:               request.Salt,
+					IV:                 request.IV,
+					EncryptionMetadata: request.Encryption,
+				},
+				FileName:      request.Filename,
+				FileSize:      request.FileSize,
+				BlobSize:      fileheader.Size,
+				MimeType:      request.MimeType,
+				FileCreatedAt: request.FileCreatedAt,
+				FileUpdatedAt: request.FileUpdatedAt,
+				FileId:        id,
+			}
 		default:
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid item type"})
 			return

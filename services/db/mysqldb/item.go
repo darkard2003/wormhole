@@ -49,7 +49,7 @@ func (r *MySqlRepo) CreateFileItem(item *models.FileItem) (int, error) {
 		return -1, ToDBError(err, "items", "id")
 	}
 
-	_, err = tx.Exec("INSERT INTO file_items (item_id, file_name, file_size, mime_type, file_created_at, file_updated_at, file_url) VALUES (?, ?, ?, ?, ?, ?, ?)", id, item.FileName, item.FileSize, item.MimeType, item.FileCreatedAt, item.FileUpdatedAt, item.FileUrl)
+	_, err = tx.Exec("INSERT INTO file_items (item_id, file_name, file_size, mime_type, file_created_at, file_updated_at, file_id) VALUES (?, ?, ?, ?, ?, ?, ?)", id, item.FileName, item.FileSize, item.MimeType, item.FileCreatedAt, item.FileUpdatedAt, item.FileId)
 
 	if err != nil {
 		return -1, ToDBError(err, "items", "id")
@@ -93,7 +93,7 @@ func (r *MySqlRepo) GetItemById(id int) (any, error) {
 		return textItem, nil
 	case models.ItemTypeFile:
 		fileItem.Item = *item
-		err = r.DB.QueryRow("SELECT file_name, file_size, mime_type, file_created_at, file_updated_at, file_url FROM file_items WHERE item_id = ?", id).Scan(&fileItem.FileName, &fileItem.FileSize, &fileItem.MimeType, &fileItem.FileCreatedAt, &fileItem.FileUpdatedAt, &fileItem.FileUrl)
+		err = r.DB.QueryRow("SELECT file_name, file_size, mime_type, file_created_at, file_updated_at, file_id FROM file_items WHERE item_id = ?", id).Scan(&fileItem.FileName, &fileItem.FileSize, &fileItem.MimeType, &fileItem.FileCreatedAt, &fileItem.FileUpdatedAt, &fileItem.FileId)
 		if err != nil {
 			return nil, ToDBError(err, "items", "id")
 		}
@@ -135,7 +135,7 @@ func (r *MySqlRepo) PopLatestItem(channelId int) (any, error) {
 		returnItem = textItem
 	case models.ItemTypeFile:
 		fileItem.Item = *item
-		err = tx.QueryRow("SELECT file_name, file_size, mime_type, file_created_at, file_updated_at, file_url FROM file_items WHERE item_id = ?", item.ID).Scan(&fileItem.FileName, &fileItem.FileSize, &fileItem.MimeType, &fileItem.FileCreatedAt, &fileItem.FileUpdatedAt, &fileItem.FileUrl)
+		err = tx.QueryRow("SELECT file_name, file_size, mime_type, file_created_at, file_updated_at, file_id FROM file_items WHERE item_id = ?", item.ID).Scan(&fileItem.FileName, &fileItem.FileSize, &fileItem.MimeType, &fileItem.FileCreatedAt, &fileItem.FileUpdatedAt, &fileItem.FileId)
 		if err != nil {
 			return nil, ToDBError(err, "items", "id")
 		}
@@ -185,7 +185,7 @@ func (r *MySqlRepo) GetLatestItem(channelId int) (any, error) {
 		returnItem = textItem
 	case models.ItemTypeFile:
 		fileItem.Item = *item
-		err = tx.QueryRow("SELECT file_name, file_size, mime_type, file_created_at, file_updated_at, file_url FROM file_items WHERE item_id = ?", item.ID).Scan(&fileItem.FileName, &fileItem.FileSize, &fileItem.MimeType, &fileItem.FileCreatedAt, &fileItem.FileUpdatedAt, &fileItem.FileUrl)
+		err = tx.QueryRow("SELECT file_name, file_size, mime_type, file_created_at, file_updated_at, file_id FROM file_items WHERE item_id = ?", item.ID).Scan(&fileItem.FileName, &fileItem.FileSize, &fileItem.MimeType, &fileItem.FileCreatedAt, &fileItem.FileUpdatedAt, &fileItem.FileId)
 		if err != nil {
 			return nil, ToDBError(err, "items", "id")
 		}

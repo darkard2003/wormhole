@@ -12,10 +12,13 @@ import (
 	"github.com/darkard2003/wormhole/services/db"
 	"github.com/darkard2003/wormhole/services/db/mysqldb"
 	"github.com/darkard2003/wormhole/services/envservice"
+	storageservice "github.com/darkard2003/wormhole/services/storage_service"
+	localstorage "github.com/darkard2003/wormhole/services/storage_service/local_storage"
 	"github.com/gin-gonic/gin"
 )
 
 var appDb db.DBInterface
+var storage storageservice.StorageInterface
 
 func init() {
 	envservice.LoadEnv()
@@ -27,6 +30,14 @@ func init() {
 		os.Exit(1)
 	}
 	log.Println("Database initialized successfully")
+
+	storePath, err := envservice.GetEnv("STORE_PATH")
+	if err != nil {
+		log.Println("Error getting store path:", err)
+		os.Exit(1)
+	}
+	storage = localstorage.NewLocalStorage(storePath)
+	log.Println("Storage service initialized successfully")
 }
 
 func main() {
@@ -43,7 +54,7 @@ func main() {
 
 	authenticatedRoute.GET("/status", authhandelers.AuthStatus)
 	channelhandelers.RegisterChannelRoutes(authenticatedRoute, appDb)
-	itemhandelers.RegisterItemRoutes(authenticatedRoute, appDb)
+	itemhandelers.RegisterItemRoutes(authenticatedRoute, appDb, storage)
 
 	r.Run()
 }

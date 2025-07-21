@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS file_items (
     mime_type VARCHAR(100) NOT NULL,
     file_created_at DATETIME,
     file_updated_at DATETIME,
-    file_url VARCHAR(500) NOT NULL,
+    file_id VARCHAR(255) NOT NULL,
     
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
     
