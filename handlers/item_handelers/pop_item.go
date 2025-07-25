@@ -107,6 +107,9 @@ func PopItem(db db.DBInterface, s storageservice.StorageInterface) gin.HandlerFu
 			}
 			filePart.Write(data)
 			mw.Close()
+			return
+		default:
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid item type"})
 		}
 	}
 }
