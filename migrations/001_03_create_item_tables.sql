@@ -31,8 +31,8 @@ CREATE TABLE IF NOT EXISTS file_items (
     blob_size BIGINT NOT NULL,
     file_size BIGINT NOT NULL,
     mime_type VARCHAR(100) NOT NULL,
-    file_created_at DATETIME,
-    file_updated_at DATETIME,
+    file_created_at VARCHAR(255) NOT NULL,
+    file_updated_at  VARCHAR(255) NOT NULL,
     file_id VARCHAR(255) NOT NULL,
     
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,

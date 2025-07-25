@@ -1,0 +1,11 @@
+--a24e9e423f2988d2305e7ef586c02c83cb2883e8ff214b24ec42e4112cb0
+Content-Disposition: form-data; name="json"
+
+{"id":33,"user_id":6,"channel_id":2,"type":"file","title":"test file","uploaded_at":"2025-07-25 19:43:18","salt":"somesalt","iv":"someiv","encryption_metadata":"none","file_name":"","file_size":0,"blob_size":19,"mime_type":"","file_created_at":"","file_updated_at":"","file_id":"e33044b1-4742-470f-8bfe-e828ad15fd62"}
+
+--a24e9e423f2988d2305e7ef586c02c83cb2883e8ff214b24ec42e4112cb0
+Content-Disposition: form-data; name="file"; filename=""
+Content-Type: application/octet-stream
+
+this is a test file
+--a24e9e423f2988d2305e7ef586c02c83cb2883e8ff214b24ec42e4112cb0--

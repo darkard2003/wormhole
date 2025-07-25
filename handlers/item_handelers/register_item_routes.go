@@ -8,5 +8,5 @@ import (
 
 func RegisterItemRoutes(router *gin.RouterGroup, db db.DBInterface, s storageservice.StorageInterface) {
 	router.POST("/items", PushItem(db, s))
-	router.GET("/items", PopItem(db))
+	router.GET("/items", PopItem(db, s))
 }

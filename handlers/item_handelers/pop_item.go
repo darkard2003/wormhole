@@ -1,10 +1,14 @@
 package itemhandelers
 
 import (
+	"encoding/json"
 	"log"
+	"mime/multipart"
 	"net/http"
 
+	"github.com/darkard2003/wormhole/models"
 	"github.com/darkard2003/wormhole/services/db"
+	storageservice "github.com/darkard2003/wormhole/services/storage_service"
 	"github.com/darkard2003/wormhole/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -15,7 +19,7 @@ type PopItemRequest struct {
 	ChannelPassword string `json:"channel_password"`
 }
 
-func PopItem(db db.DBInterface) gin.HandlerFunc {
+func PopItem(db db.DBInterface, s storageservice.StorageInterface) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		userId, exists := ctx.Get("userId")
 		if !exists || userId == nil {
@@ -49,17 +53,11 @@ func PopItem(db db.DBInterface) gin.HandlerFunc {
 
 		if channel.Protected {
 			if request.ChannelPassword == "" {
-				ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Channel password required"})
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Channel password required"})
 				return
 			}
-			passHashBytes, err := bcrypt.GenerateFromPassword([]byte(request.ChannelPassword), bcrypt.DefaultCost)
+			err := bcrypt.CompareHashAndPassword([]byte(channel.Password), []byte(request.ChannelPassword))
 			if err != nil {
-				log.Println("Error hashing password:", err)
-				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
-				return
-			}
-
-			if string(passHashBytes) != channel.Password {
 				ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Channel password incorrect"})
 				return
 			}
@@ -76,6 +74,39 @@ func PopItem(db db.DBInterface) gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{"item": item})
+		switch item := item.(type) {
+		case *models.TextItem:
+			textItem := item
+			ctx.JSON(http.StatusOK, gin.H{"item": textItem})
+			return
+		case *models.FileItem:
+			fileId := item.FileId
+			data, err := s.GetBlob(fileId)
+			if err != nil {
+				log.Println("Error getting blob:", err)
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+				return
+			}
+
+			mw := multipart.NewWriter(ctx.Writer)
+			ctx.Header("Content-Type", mw.FormDataContentType())
+
+			jsonPart, err := mw.CreateFormField("json")
+			if err != nil {
+				log.Println("Error creating json part:", err)
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+				return
+			}
+			json.NewEncoder(jsonPart).Encode(item)
+
+			filePart, err := mw.CreateFormFile("file", item.FileName)
+			if err != nil {
+				log.Println("Error creating file part:", err)
+				ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+				return
+			}
+			filePart.Write(data)
+			mw.Close()
+		}
 	}
 }
