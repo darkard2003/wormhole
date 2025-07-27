@@ -47,7 +47,15 @@ func SignInHandlerHandler(db db.DBInterface) gin.HandlerFunc {
 			return
 		}
 
-		jwtToken, err := jwt.GenerateToken(user.Id, user.Username)
+		jwtToken, exp, err := jwt.GenerateToken(user.Id, user.Username)
+		if err != nil {
+			log.Println("Error generating JWT token:", err)
+			ctx.JSON(500, gin.H{"error": "Failed to generate token"})
+			return
+		}
+
+		refereshToken, refereshExp, err := jwt.GenerateRefereshToken(user.Id, user.Username)
+
 		if err != nil {
 			log.Println("Error generating JWT token:", err)
 			ctx.JSON(500, gin.H{"error": "Failed to generate token"})
@@ -55,8 +63,11 @@ func SignInHandlerHandler(db db.DBInterface) gin.HandlerFunc {
 		}
 
 		ctx.JSON(200, gin.H{
-			"token":   jwtToken,
-			"message": "Sign in successful",
+			"token":              jwtToken,
+			"expires_at":         exp,
+			"refresh_token":      refereshToken,
+			"refresh_expires_at": refereshExp,
+			"message":            "Sign in successful",
 		})
 	}
 }

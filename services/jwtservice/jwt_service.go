@@ -2,54 +2,81 @@ package jwtservice
 
 import (
 	"fmt"
-	"os"
 	"time"
 
+	"github.com/darkard2003/wormhole/models"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
 type JWTService struct {
-	SecretKey string
+	AccessSecrectKey  string
+	RefreshSecrectKey string
 }
 
-type Claims struct {
-	jwt.RegisteredClaims
-	UserID   int    `json:"user_id"`
-	UserName string `json:"user_name"`
-}
-
-func NewJWTService() *JWTService {
+func NewJWTService(accessSecrectKey, refreshSecrectKey string) *JWTService {
 	service := &JWTService{
-		SecretKey: os.Getenv("JWT_SECRET_KEY"),
+		accessSecrectKey,
+		refreshSecrectKey,
 	}
 	return service
 }
 
-func (s *JWTService) GenerateToken(userID int, userName string) (string, error) {
-	claims := &Claims{
+func (s *JWTService) GenerateToken(userID int, userName string) (string, string, error) {
+	exp := time.Now().Add(time.Hour)
+	claims := &models.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Subject:   fmt.Sprintf("%d", userID),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour * 30)),
+			ExpiresAt: jwt.NewNumericDate(exp),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			Issuer:    "wormhole",
 			ID:        uuid.New().String(),
 		},
-		UserID:   userID,
-		UserName: userName,
+		UserID:    userID,
+		UserName:  userName,
+		TokenType: models.TOKEN_TYPE_ACCESS,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(s.SecretKey))
+	tokenString, err := token.SignedString([]byte(s.AccessSecrectKey))
+	if err != nil {
+		return "", "", err
+	}
+
+	return tokenString, exp.Format(time.RFC3339), nil
 }
 
-func (s *JWTService) ValidateToken(tokenString string) (*Claims, error) {
-	claims := &Claims{}
+func (s *JWTService) GenerateRefereshToken(userID int, userName string) (string, string, error) {
+	exp := time.Now().Add(time.Hour * 24 * 30)
+
+	claims := &models.Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Subject:   fmt.Sprintf("%d", userID),
+			ExpiresAt: jwt.NewNumericDate(exp),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+			Issuer:    "wormhole",
+			ID:        uuid.New().String(),
+		},
+		UserID:    userID,
+		UserName:  userName,
+		TokenType: models.TOKEN_TYPE_REFRESH,
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(s.RefreshSecrectKey))
+	if err != nil {
+		return "", "", err
+	}
+	return tokenString, exp.Format(time.RFC3339), nil
+}
+
+func (s *JWTService) ValidateAccessToken(tokenString string) (*models.Claims, error) {
+	claims := &models.Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, jwt.ErrSignatureInvalid
 		}
-		return []byte(s.SecretKey), nil
+		return []byte(s.AccessSecrectKey), nil
 	})
 	if err != nil {
 		return nil, err
@@ -57,5 +84,25 @@ func (s *JWTService) ValidateToken(tokenString string) (*Claims, error) {
 	if !token.Valid {
 		return nil, fmt.Errorf("invalid token")
 	}
+	return claims, nil
+}
+
+func (s *JWTService) ValidateRefreshToken(tokenString string) (*models.Claims, error) {
+	claims := &models.Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return []byte(s.RefreshSecrectKey), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !token.Valid {
+		return nil, fmt.Errorf("invalid token")
+	}
+
 	return claims, nil
 }

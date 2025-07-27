@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/darkard2003/wormhole/models"
 	"github.com/darkard2003/wormhole/services/jwtservice"
 	"github.com/gin-gonic/gin"
 )
@@ -32,7 +33,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		jwt := jwtservice.GetJWTService()
 
-		claims, err := jwt.ValidateToken(token)
+		claims, err := jwt.ValidateAccessToken(token)
 		if err != nil {
 			log.Println("Error validating token:", err)
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
@@ -51,6 +52,12 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		if userId == 0 || userName == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			c.Abort()
+			return
+		}
+
+		if claims.TokenType != models.TOKEN_TYPE_ACCESS {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token type"})
 			c.Abort()
 			return
 		}

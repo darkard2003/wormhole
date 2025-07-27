@@ -1,15 +1,23 @@
-BINARY_NAME=wormhole
+SERVER_BINARY_NAME=wormhole-server
+CLI_BINARY_NAME=wormhole-cli
 OUT_DIR=out
 
-all: build
+all: build-server build-cli
 
-build:
-	@echo "Building $(BINARY_NAME)..."
+build-server:
+	@echo "Building $(SERVER_BINARY_NAME)..."
 	@mkdir -p $(OUT_DIR)
-	@go build -o $(OUT_DIR)/$(BINARY_NAME) main.go
+	@go build -o $(OUT_DIR)/$(SERVER_BINARY_NAME) ./cmd/server/main.go
 
-run:
-	@echo "Running $(BINARY_NAME) with go run..."
-	@go run main.go &
+build-cli:
+	@echo "Building $(CLI_BINARY_NAME)..."
+	@mkdir -p $(OUT_DIR)
+	@go build -o $(OUT_DIR)/$(CLI_BINARY_NAME) ./cmd/cli/main.go
 
-.PHONY: all build run
+build: build-server build-cli
+
+run-server:
+	@echo "Running $(SERVER_BINARY_NAME)..."
+	@$(OUT_DIR)/$(SERVER_BINARY_NAME)
+
+.PHONY: all build build-server build-cli run-server
