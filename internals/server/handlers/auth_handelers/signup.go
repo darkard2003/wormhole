@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/darkard2003/wormhole/internals/models"
 	"github.com/darkard2003/wormhole/internals/services/db"
-	"github.com/darkard2003/wormhole/models"
-	"github.com/darkard2003/wormhole/utils"
+	"github.com/darkard2003/wormhole/internals/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )

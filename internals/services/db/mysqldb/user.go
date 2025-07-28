@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/darkard2003/wormhole/models"
+	"github.com/darkard2003/wormhole/internals/models"
 )
 
 func (s *MySqlRepo) CreateUser(username, password string, email *string) (int, error) {

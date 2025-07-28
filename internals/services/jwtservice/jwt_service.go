@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/darkard2003/wormhole/models"
+	"github.com/darkard2003/wormhole/internals/models"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )

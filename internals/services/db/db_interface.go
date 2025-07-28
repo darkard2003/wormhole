@@ -1,6 +1,6 @@
 package db
 
-import "github.com/darkard2003/wormhole/models"
+import "github.com/darkard2003/wormhole/internals/models"
 
 type DBInterface interface {
 	Initialize() error

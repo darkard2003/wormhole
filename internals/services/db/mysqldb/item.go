@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/darkard2003/wormhole/internals/models"
 	"github.com/darkard2003/wormhole/internals/services/db"
-	"github.com/darkard2003/wormhole/models"
 )
 
 func (r *MySqlRepo) CreateTextItem(item *models.TextItem) (int, error) {
