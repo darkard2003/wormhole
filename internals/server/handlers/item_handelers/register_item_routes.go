@@ -1,8 +1,8 @@
 package itemhandelers
 
 import (
-	"github.com/darkard2003/wormhole/services/db"
-	storageservice "github.com/darkard2003/wormhole/services/storage_service"
+	"github.com/darkard2003/wormhole/internals/services/db"
+	storageservice "github.com/darkard2003/wormhole/internals/services/storage_service"
 	"github.com/gin-gonic/gin"
 )
 

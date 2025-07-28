@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/darkard2003/wormhole/services/db"
-	"github.com/darkard2003/wormhole/services/jwtservice"
+	"github.com/darkard2003/wormhole/internals/services/db"
+	"github.com/darkard2003/wormhole/internals/services/jwtservice"
 	"github.com/gin-gonic/gin"
 )
 

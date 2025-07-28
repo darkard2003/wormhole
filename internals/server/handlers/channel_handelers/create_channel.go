@@ -3,7 +3,7 @@ package channelhandelers
 import (
 	"log"
 
-	"github.com/darkard2003/wormhole/services/db"
+	"github.com/darkard2003/wormhole/internals/services/db"
 	"github.com/darkard2003/wormhole/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"

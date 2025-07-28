@@ -6,9 +6,9 @@ import (
 	"mime/multipart"
 	"net/http"
 
+	"github.com/darkard2003/wormhole/internals/services/db"
+	storageservice "github.com/darkard2003/wormhole/internals/services/storage_service"
 	"github.com/darkard2003/wormhole/models"
-	"github.com/darkard2003/wormhole/services/db"
-	storageservice "github.com/darkard2003/wormhole/services/storage_service"
 	"github.com/darkard2003/wormhole/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"

@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	errorNumbers "github.com/bombsimon/mysql-error-numbers"
-	"github.com/darkard2003/wormhole/services/db"
+	"github.com/darkard2003/wormhole/internals/services/db"
 	"github.com/go-sql-driver/mysql"
 )
 

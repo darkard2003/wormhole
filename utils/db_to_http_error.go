@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/darkard2003/wormhole/services/db"
+	"github.com/darkard2003/wormhole/internals/services/db"
 )
 
 type HttpError struct {

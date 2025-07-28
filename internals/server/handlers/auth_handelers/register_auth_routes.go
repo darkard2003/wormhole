@@ -1,8 +1,8 @@
 package authhandelers
 
 import (
-	"github.com/darkard2003/wormhole/middleware"
-	"github.com/darkard2003/wormhole/services/db"
+	"github.com/darkard2003/wormhole/internals/server/middleware"
+	"github.com/darkard2003/wormhole/internals/services/db"
 	"github.com/gin-gonic/gin"
 )
 

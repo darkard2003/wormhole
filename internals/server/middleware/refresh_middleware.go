@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/darkard2003/wormhole/internals/services/jwtservice"
 	"github.com/darkard2003/wormhole/models"
-	"github.com/darkard2003/wormhole/services/jwtservice"
 	"github.com/gin-gonic/gin"
 )
 

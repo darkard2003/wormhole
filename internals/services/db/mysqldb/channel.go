@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/darkard2003/wormhole/internals/services/db"
 	"github.com/darkard2003/wormhole/models"
-	"github.com/darkard2003/wormhole/services/db"
 )
 
 func (s *MySqlRepo) CreateChannel(userId int, channelName, channelDescription string, protected bool, password string) (int, error) {

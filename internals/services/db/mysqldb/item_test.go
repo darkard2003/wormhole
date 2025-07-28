@@ -1,8 +1,9 @@
 package mysqldb_test
 
 import (
-	"github.com/darkard2003/wormhole/services/db/mysqldb"
 	"testing"
+
+	"github.com/darkard2003/wormhole/internals/services/db/mysqldb"
 )
 
 func TestMySqlRepo_PopLatestItem(t *testing.T) {
