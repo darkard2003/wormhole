@@ -1,0 +1,4 @@
+name: me
+url: $BASE_URL/user/me
+scripts:
+  on_request: scripts/add_token_to_request.py

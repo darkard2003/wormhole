@@ -64,6 +64,7 @@ func main() {
 	authenticatedRoute.Use(middleware.AuthMiddleware())
 
 	authenticatedRoute.GET("/status", authhandelers.AuthStatus)
+	authenticatedRoute.GET("/me", authhandelers.UserDetails(appDb))
 	channelhandelers.RegisterChannelRoutes(authenticatedRoute, appDb)
 	itemhandelers.RegisterItemRoutes(authenticatedRoute, appDb, storage)
 

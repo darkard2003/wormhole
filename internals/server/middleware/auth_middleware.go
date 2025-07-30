@@ -67,3 +67,21 @@ func AuthMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func GetUserId(c *gin.Context) (uint64, bool) {
+	_userId, ok := c.Get("userId")
+	if !ok {
+		return 0, false
+	}
+	userId := _userId.(uint64)
+	return userId, true
+}
+
+func GetUserName(c *gin.Context) (string, bool) {
+	_userName, ok := c.Get("userName")
+	if !ok {
+		return "", false
+	}
+	userName := _userName.(string)
+	return userName, true
+}

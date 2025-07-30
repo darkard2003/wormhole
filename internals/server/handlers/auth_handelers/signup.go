@@ -21,7 +21,7 @@ func SignUpHandlerHandler(db db.DBInterface) gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		var userInput UserInput
-		if err := ctx.ShouldBindJSON(&userInput); err != nil {
+		if err := ctx.ShouldBind(&userInput); err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 			return
 		}
