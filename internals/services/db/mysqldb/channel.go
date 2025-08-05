@@ -69,23 +69,30 @@ func (s *MySqlRepo) GetChannelByName(userId int, channelName string) (*models.Ch
 	return channel, nil
 }
 
-func (s *MySqlRepo) GetChannelsByUserId(userId int) ([]*models.Channel, error) {
+func (s *MySqlRepo) GetChannelsByUserId(userId, limit, offset int) (int, []*models.Channel, error) {
 	channels := []*models.Channel{}
-	rows, err := s.DB.Query("SELECT id, user_id, name, description, protected, password FROM channels WHERE user_id = ?", userId)
+	total := 0
+
+	err := s.DB.QueryRow("SELECT COUNT(*) FROM channels WHERE user_id = ?", userId).Scan(&total)
+	if err != nil {
+		log.Println("Error querying channel count:", err)
+		return -1, nil, ToDBError(err, "channels", "id")
+	}
+	rows, err := s.DB.Query("SELECT id, user_id, name, description, protected, password  FROM channels WHERE user_id = ? LIMIT ? OFFSET ?", userId, limit, offset)
 	if err != nil {
 		log.Println("Error querying channels:", err)
-		return nil, ToDBError(err, "channels", "id")
+		return -1, nil, ToDBError(err, "channels", "id")
 	}
 	defer rows.Close()
 	for rows.Next() {
 		channel := &models.Channel{}
 		if err := rows.Scan(&channel.ID, &channel.UserID, &channel.Name, &channel.Description, &channel.Protected, &channel.Password); err != nil {
 			log.Println("Error scanning channel row:", err)
-			return nil, err
+			return -1, nil, err
 		}
 		channels = append(channels, channel)
 	}
-	return channels, nil
+	return total, channels, nil
 }
 
 func (s *MySqlRepo) UpdateChannel(channel *models.Channel) error {

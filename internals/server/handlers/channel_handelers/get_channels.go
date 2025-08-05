@@ -2,6 +2,7 @@ package channelhandelers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/darkard2003/wormhole/internals/models"
 	"github.com/darkard2003/wormhole/internals/services/db"
@@ -24,7 +25,19 @@ func GetChannelHandeler(db db.DBInterface) gin.HandlerFunc {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			return
 		}
-		channels, err := db.GetChannelsByUserId(userId.(int))
+		limit := ctx.DefaultQuery("limit", "10")
+		offset := ctx.DefaultQuery("offset", "0")
+		limitInt, err := strconv.Atoi(limit)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit"})
+			return
+		}
+		offsetInt, err := strconv.Atoi(offset)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid offset"})
+			return
+		}
+		total, channels, err := db.GetChannelsByUserId(userId.(int), limitInt, offsetInt)
 		if err != nil {
 			httpError := utils.DBToHttpError(err)
 			ctx.JSON(httpError.Code, gin.H{"error": httpError.Response})
@@ -35,7 +48,9 @@ func GetChannelHandeler(db db.DBInterface) gin.HandlerFunc {
 			sanitizedChannels[i] = SanitizeChannel(channel)
 		}
 		ctx.JSON(http.StatusOK, gin.H{
-			"total":    len(channels),
+			"total":    total,
+			"limit":    limitInt,
+			"offset":   offsetInt,
 			"channels": sanitizedChannels,
 		})
 	}

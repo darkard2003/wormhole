@@ -50,7 +50,7 @@ func SignInHandlerHandler(db db.DBInterface) gin.HandlerFunc {
 		jwtToken, exp, err := jwt.GenerateToken(user.Id, user.Username)
 		if err != nil {
 			log.Println("Error generating JWT token:", err)
-			ctx.JSON(500, gin.H{"error": "Failed to generate token"})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 			return
 		}
 
@@ -58,11 +58,11 @@ func SignInHandlerHandler(db db.DBInterface) gin.HandlerFunc {
 
 		if err != nil {
 			log.Println("Error generating JWT token:", err)
-			ctx.JSON(500, gin.H{"error": "Failed to generate token"})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 			return
 		}
 
-		ctx.JSON(200, gin.H{
+		ctx.JSON(http.StatusOK, gin.H{
 			"token":              jwtToken,
 			"expires_at":         exp,
 			"refresh_token":      refereshToken,

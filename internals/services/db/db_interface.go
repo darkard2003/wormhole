@@ -15,7 +15,7 @@ type DBInterface interface {
 	CreateChannel(userId int, channelName, channelDescription string, protected bool, password string) (int, error)
 	GetChannelById(id int) (*models.Channel, error)
 	GetChannelByName(userId int, channelName string) (*models.Channel, error)
-	GetChannelsByUserId(userId int) ([]*models.Channel, error)
+	GetChannelsByUserId(userId, limit, offset int) (int, []*models.Channel, error)
 	UpdateChannel(channel *models.Channel) error
 	DeleteChannel(id, userId int) error
 
