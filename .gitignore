@@ -9,6 +9,7 @@
 
 # Local environment variables
 .env
+posting/posting.env
 
 # IDE settings folders
 .idea/
