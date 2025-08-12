@@ -16,3 +16,11 @@
 
 # Scratch directory for temporary files
 scratch/
+
+# Build output directory
+out/
+
+# Temporary files
+no current target
+# Ignore build artifacts
+out/
